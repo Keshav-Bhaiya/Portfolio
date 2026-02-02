@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-import React, { useRef, useState, MouseEvent } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Project from './Project';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -16,83 +16,100 @@ const ProjectList = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const projectListRef = useRef<HTMLDivElement>(null);
     const imageContainer = useRef<HTMLDivElement>(null);
-    const [selectedProject, setSelectedProject] = useState<string | null>(
-        PROJECTS[0]?.slug ?? null,
-    );
+    const [selectedProject, setSelectedProject] = useState<string | null>(null);
+    const [isMobile, setIsMobile] = useState(true);
 
-    // Handle hover image movement
-    useGSAP(
-        (context, contextSafe) => {
-            if (window.innerWidth < 768) {
+    // ✅ Initialize properly
+    useEffect(() => {
+        const checkMobile = () => {
+            const mobile = window.innerWidth < 768;
+            setIsMobile(mobile);
+
+            // Set first project as default on desktop
+            if (!mobile) {
+                setSelectedProject(PROJECTS[0]?.slug ?? null);
+            } else {
                 setSelectedProject(null);
+            }
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+        };
+    }, []);
+
+    // ✅ Mouse movement handler
+    useEffect(() => {
+        if (isMobile || !imageContainer.current) return;
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!containerRef.current || !imageContainer.current) return;
+
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const imageRect = imageContainer.current.getBoundingClientRect();
+
+            // Check if mouse is inside container
+            const isInside =
+                e.clientY >= containerRect.top &&
+                e.clientY <= containerRect.bottom &&
+                e.clientX >= containerRect.left &&
+                e.clientX <= containerRect.right;
+
+            if (!isInside) {
+                gsap.to(imageContainer.current, {
+                    opacity: 0,
+                    duration: 0.3,
+                });
                 return;
             }
 
-            const handleMouseMove = contextSafe?.((e: MouseEvent) => {
-                if (!containerRef.current || !imageContainer.current) return;
+            // Calculate position
+            const offsetTop = e.clientY - containerRect.top;
 
-                const containerRect =
-                    containerRef.current.getBoundingClientRect();
-                const imageRect =
-                    imageContainer.current.getBoundingClientRect();
-                const offsetTop = e.clientY - containerRect.y;
+            gsap.to(imageContainer.current, {
+                y: offsetTop - imageRect.height / 2,
+                opacity: 1,
+                duration: 0.6,
+                ease: 'power2.out',
+            });
+        };
 
-                // Hide if outside
-                if (
-                    containerRect.y > e.clientY ||
-                    containerRect.bottom < e.clientY ||
-                    containerRect.x > e.clientX ||
-                    containerRect.right < e.clientX
-                ) {
-                    return gsap.to(imageContainer.current, {
-                        duration: 0.3,
-                        opacity: 0,
-                    });
-                }
+        window.addEventListener('mousemove', handleMouseMove);
 
-                gsap.to(imageContainer.current, {
-                    y: offsetTop - imageRect.height / 2,
-                    duration: 1,
-                    opacity: 1,
-                });
-            }) as any;
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, [isMobile]);
 
-            window.addEventListener('mousemove', handleMouseMove);
-
-            return () => {
-                window.removeEventListener('mousemove', handleMouseMove);
-            };
-        },
-        { scope: containerRef },
-    );
-
-    // Animate section in
+    // ✅ Scroll animation
     useGSAP(
         () => {
-            const tl = gsap.timeline({
+            if (!containerRef.current) return;
+
+            gsap.from(containerRef.current, {
                 scrollTrigger: {
                     trigger: containerRef.current,
                     start: 'top bottom',
                     end: 'top 80%',
                     scrub: 1,
                 },
-            });
-
-            tl.from(containerRef.current, {
-                y: 150,
+                y: 100,
                 opacity: 0,
             });
         },
         { scope: containerRef },
     );
 
-    const handleMouseEnter = (slug: string) => {
-        if (window.innerWidth < 768) {
-            setSelectedProject(null);
-            return;
-        }
-        setSelectedProject(slug);
-    };
+    const handleMouseEnter = useCallback(
+        (slug: string) => {
+            if (isMobile) return;
+            setSelectedProject(slug);
+        },
+        [isMobile],
+    );
 
     return (
         <section className="pb-section" id="selected-projects">
@@ -100,10 +117,15 @@ const ProjectList = () => {
                 <SectionTitle title="SELECTED PROJECTS" />
 
                 <div className="group/projects relative" ref={containerRef}>
-                    {selectedProject && (
+                    {/* ✅ FIXED: Hover image container */}
+                    {!isMobile && selectedProject && (
                         <div
                             ref={imageContainer}
-                            className="max-md:hidden absolute right-0 top-0 z-[1] pointer-events-none w-[200px] xl:w-[350px] aspect-[3/4] overflow-hidden opacity-0"
+                            className="hidden md:block fixed right-[1%] xl:right-[-6%] top-0 z-[100] pointer-events-none w-[280px] xl:w-[350px] aspect-[3/4] overflow-hidden rounded-lg shadow-2xl"
+                            style={{
+                                opacity: 0,
+                                willChange: 'transform, opacity',
+                            }}
                         >
                             {PROJECTS.map((project) => (
                                 <img
@@ -111,20 +133,19 @@ const ProjectList = () => {
                                     src={project.thumbnail}
                                     alt={project.title}
                                     className={cn(
-                                        'absolute inset-0 w-full h-full object-cover transition-opacity duration-500',
-                                        {
-                                            'opacity-0':
-                                                project.slug !==
-                                                selectedProject,
-                                        },
+                                        'absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-500',
+                                        selectedProject === project.slug
+                                            ? 'opacity-100'
+                                            : 'opacity-0',
                                     )}
+                                    style={{ willChange: 'opacity' }}
                                 />
                             ))}
                         </div>
                     )}
 
                     <div
-                        className="flex flex-col max-md:gap-10"
+                        className="flex flex-col max-md:gap-10 relative z-10"
                         ref={projectListRef}
                     >
                         {PROJECTS.map((project, index) => (

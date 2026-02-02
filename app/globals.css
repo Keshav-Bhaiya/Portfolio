@@ -38,11 +38,20 @@
     ::-webkit-scrollbar {
         display: none;
     }
+
     * {
-        @apply border-border !cursor-none;
+        @apply border-border;
     }
+
     body {
         @apply bg-background text-foreground font-roboto-flex;
+        overflow-x: hidden;
+    }
+
+    /* ✅ Better performance */
+    img {
+        transform: translateZ(0);
+        backface-visibility: hidden;
     }
 }
 
@@ -54,4 +63,9 @@
     .markdown-text ul {
         @apply pl-5 mt-2 list-disc;
     }
+}
+
+/* ✅ Smooth scrolling */
+html {
+    scroll-behavior: smooth;
 }

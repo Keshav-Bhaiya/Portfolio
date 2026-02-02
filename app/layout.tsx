@@ -21,12 +21,14 @@ const antonFont = Anton({
     weight: '400',
     subsets: ['latin'],
     variable: '--font-anton',
+    display: 'swap',
 });
 
 const robotoFlex = Roboto_Flex({
     weight: ['100', '400', '500', '600', '700', '800'],
     subsets: ['latin'],
     variable: '--font-roboto-flex',
+    display: 'swap',
 });
 
 /* -------------------- Metadata -------------------- */
@@ -34,7 +36,7 @@ const robotoFlex = Roboto_Flex({
 export const metadata: Metadata = {
     title: 'Keshav Bhaiya | Full Stack Developer | Software Intern',
     description:
-        'I’m Keshav Bhaiya — a Full Stack Developer skilled in Java, MERN stack, and AI/GenAI applications.',
+        "I'm Keshav Bhaiya — a Full Stack Developer skilled in Java, MERN stack, and AI/GenAI applications.",
     keywords: [
         'Keshav Bhaiya',
         'Full Stack Developer',
@@ -115,8 +117,18 @@ export default function RootLayout({
                 {/* 🔹 BACKGROUND */}
                 <ParticleBackground />
 
-                {/* 🔹 MAIN APP */}
-                <ReactLenis root options={{ lerp: 0.1, duration: 1.4 }}>
+                {/* 🔹 MAIN APP - ✅ OPTIMIZED Lenis settings */}
+                <ReactLenis
+                    root
+                    options={{
+                        lerp: 0.05,
+                        duration: 1.2,
+                        smoothWheel: true,
+                        wheelMultiplier: 1,
+                        touchMultiplier: 2,
+                        infinite: false,
+                    }}
+                >
                     <Navbar />
                     <main className="relative z-[2]">{children}</main>
                     <Footer />

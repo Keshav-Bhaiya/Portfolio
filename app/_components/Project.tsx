@@ -17,6 +17,7 @@ gsap.registerPlugin(useGSAP);
 
 const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     const externalLinkSVGRef = useRef<SVGSVGElement>(null);
+    const projectRef = useRef<HTMLAnchorElement>(null);
 
     const { context, contextSafe } = useGSAP(() => {}, {
         scope: externalLinkSVGRef,
@@ -26,27 +27,58 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     const handleMouseEnter = contextSafe?.(() => {
         onMouseEnter(project.slug);
 
-        const arrowLine =
-            externalLinkSVGRef.current?.querySelector('#arrow-line');
-        const arrowCurb =
-            externalLinkSVGRef.current?.querySelector('#arrow-curb');
-        const box = externalLinkSVGRef.current?.querySelector('#box');
+        if (!externalLinkSVGRef.current) return;
+
+        // ✅ FIXED: Proper type casting for SVG path elements
+        const arrowLine = externalLinkSVGRef.current.querySelector(
+            '#arrow-line',
+        ) as SVGPathElement | null;
+        const arrowCurb = externalLinkSVGRef.current.querySelector(
+            '#arrow-curb',
+        ) as SVGPathElement | null;
+        const box = externalLinkSVGRef.current.querySelector(
+            '#box',
+        ) as SVGPathElement | null;
 
         if (!box || !arrowLine || !arrowCurb) return;
 
-        gsap.set([box, arrowLine, arrowCurb], {
+        // ✅ FIXED: Check if getTotalLength exists before calling
+        const boxLength = box.getTotalLength ? box.getTotalLength() : 100;
+        const arrowLineLength = arrowLine.getTotalLength
+            ? arrowLine.getTotalLength()
+            : 100;
+        const arrowCurbLength = arrowCurb.getTotalLength
+            ? arrowCurb.getTotalLength()
+            : 100;
+
+        gsap.set(box, {
             opacity: 0,
-            strokeDasharray: (el: any) => el.getTotalLength(),
-            strokeDashoffset: (el: any) => el.getTotalLength(),
+            strokeDasharray: boxLength,
+            strokeDashoffset: boxLength,
         });
 
-        const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+        gsap.set(arrowLine, {
+            opacity: 0,
+            strokeDasharray: arrowLineLength,
+            strokeDashoffset: arrowLineLength,
+        });
 
-        tl.to(externalLinkSVGRef.current, { autoAlpha: 1 })
-            .to(box, { opacity: 1, strokeDashoffset: 0 })
-            .to(arrowLine, { opacity: 1, strokeDashoffset: 0 }, '<0.2')
-            .to(arrowCurb, { opacity: 1, strokeDashoffset: 0 })
-            .to(externalLinkSVGRef.current, { autoAlpha: 0 }, '+=1');
+        gsap.set(arrowCurb, {
+            opacity: 0,
+            strokeDasharray: arrowCurbLength,
+            strokeDashoffset: arrowCurbLength,
+        });
+
+        const tl = gsap.timeline();
+
+        tl.to(externalLinkSVGRef.current, { autoAlpha: 1, duration: 0.2 })
+            .to(box, { opacity: 1, strokeDashoffset: 0, duration: 0.3 })
+            .to(
+                arrowLine,
+                { opacity: 1, strokeDashoffset: 0, duration: 0.2 },
+                '<0.1',
+            )
+            .to(arrowCurb, { opacity: 1, strokeDashoffset: 0, duration: 0.2 });
     });
 
     const handleMouseLeave = contextSafe?.(() => {
@@ -56,22 +88,19 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     return (
         <TransitionLink
             href={`/projects/${project.slug}`}
-            className="project-item group leading-none py-5 md:border-b
-      first:!pt-0 last:pb-0 last:border-none
-      md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
+            className="project-item group leading-none py-5 md:border-b border-border
+                first:!pt-0 last:pb-0 last:border-none
+                md:group-hover/projects:opacity-30 md:hover:!opacity-100 
+                transition-opacity duration-300"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            {/* MOBILE / CARD IMAGE */}
+            {/* MOBILE IMAGE */}
             {selectedProject === null && (
                 <img
                     src={project.thumbnail}
                     alt={project.title}
-                    className="
-            w-full aspect-[3/2]
-            object-cover object-top
-            mb-6
-          "
+                    className="w-full aspect-[3/2] object-cover object-top mb-6 md:hidden"
                     loading="lazy"
                 />
             )}
@@ -81,17 +110,17 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     _{(index + 1).toString().padStart(2, '0')}.
                 </div>
 
-                <div>
+                <div className="flex-1">
                     <h4
                         className="text-4xl xs:text-6xl flex gap-4 font-anton
-          transition-all duration-700
-          bg-gradient-to-r from-primary to-foreground
-          from-[50%] to-[50%] bg-[length:200%] bg-right
-          bg-clip-text text-transparent group-hover:bg-left"
+                        transition-all duration-500
+                        bg-gradient-to-r from-primary to-foreground
+                        from-[50%] to-[50%] bg-[length:200%] bg-right
+                        bg-clip-text text-transparent group-hover:bg-left"
                     >
                         {project.title}
 
-                        <span className="text-foreground opacity-0 group-hover:opacity-100 transition-all">
+                        <span className="text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="36"
