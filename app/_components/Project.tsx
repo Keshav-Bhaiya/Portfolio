@@ -1,7 +1,6 @@
 'use client';
 
 import TransitionLink from '@/components/TransitionLink';
-import { cn } from '@/lib/utils';
 import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
