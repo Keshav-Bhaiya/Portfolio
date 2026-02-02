@@ -10,6 +10,7 @@ import ScrollProgressIndicator from '@/components/ScrollProgressIndicator';
 import CustomCursor from '@/components/CustomCursor';
 import Preloader from '@/components/Preloader';
 import StickyEmail from './_components/StickyEmail';
+import ParticleBackground from '@/components/ParticleBackground';
 
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
@@ -33,7 +34,7 @@ const robotoFlex = Roboto_Flex({
 export const metadata: Metadata = {
     title: 'Keshav Bhaiya | Full Stack Developer | Software Intern',
     description:
-        'I’m Keshav Bhaiya — a Full Stack Developer skilled in Java, MERN stack, and AI/GenAI applications. Experienced in building scalable products, award-winning projects, and clean, high-performance UI/UX.',
+        'I’m Keshav Bhaiya — a Full Stack Developer skilled in Java, MERN stack, and AI/GenAI applications.',
     keywords: [
         'Keshav Bhaiya',
         'Full Stack Developer',
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'Keshav Bhaiya | Full Stack Developer & AI Engineer',
         description:
-            'Portfolio of Keshav Bhaiya — showcasing full stack, MERN, Java, and AI-powered projects with a strong focus on performance and clean UI/UX.',
+            'Portfolio of Keshav Bhaiya showcasing full stack, MERN, Java, and AI-powered projects.',
         siteName: 'Keshav Bhaiya Portfolio',
         images: [
             {
@@ -67,7 +68,7 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'Keshav Bhaiya | Full Stack Developer',
         description:
-            'Full Stack Developer skilled in Java, MERN stack, and AI/GenAI applications. Winner of LNCT Website Creation Competition.',
+            'Full Stack Developer skilled in Java, MERN stack, and AI/GenAI applications.',
         images: ['/og-image.png'],
     },
 };
@@ -76,13 +77,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
     children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+    children: React.ReactNode;
+}) {
     return (
         <html lang="en">
-            {/* Google Analytics (optional – can change later) */}
+            {/* Analytics */}
             <GoogleAnalytics gaId="G-MHLY1LNGY5" />
 
-            {/* Structured Data for SEO */}
+            {/* Structured Data */}
             <Script
                 id="structured-data"
                 type="application/ld+json"
@@ -93,45 +96,45 @@ export default function RootLayout({
                         '@type': 'Person',
                         name: 'Keshav Bhaiya',
                         jobTitle: 'Full Stack Developer',
-                        description:
-                            'Keshav Bhaiya is a Full Stack Developer skilled in Java, MERN stack, and AI/GenAI applications with award-winning projects and strong DSA foundation.',
                         sameAs: ['https://github.com/Keshav-Bhaiya'],
                         alumniOf: {
                             '@type': 'CollegeOrUniversity',
                             name: 'LNCT Group, Bhopal',
                         },
-                        worksFor: {
-                            '@type': 'Organization',
-                            name: 'LNCT Group',
-                        },
                     }),
                 }}
             />
 
-            {/* Hotjar (optional – can remove later) */}
+            {/* Hotjar */}
             <Script id="hotjar" strategy="afterInteractive">
                 {`(function(h,o,t,j,a,r){
-          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-          h._hjSettings={hjid:6380611,hjsv:6};
-          a=o.getElementsByTagName('head')[0];
-          r=o.createElement('script');r.async=1;
-          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-          a.appendChild(r);
-        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`}
+                  h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+                  h._hjSettings={hjid:6380611,hjsv:6};
+                  a=o.getElementsByTagName('head')[0];
+                  r=o.createElement('script');r.async=1;
+                  r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+                  a.appendChild(r);
+                })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`}
             </Script>
 
             <body
-                className={`${antonFont.variable} ${robotoFlex.variable} antialiased`}
+                className={`${antonFont.variable} ${robotoFlex.variable} antialiased relative`}
             >
+                {/* 🔹 BACKGROUND LAYER */}
+                <ParticleBackground />
+
+                {/* 🔹 APP CONTENT */}
                 <ReactLenis root options={{ lerp: 0.1, duration: 1.4 }}>
                     <Navbar />
-                    <main>{children}</main>
+                    <main className="relative z-[2]">{children}</main>
                     <Footer />
-                    <CustomCursor />
-                    <Preloader />
-                    <ScrollProgressIndicator />
-                    <StickyEmail />
                 </ReactLenis>
+
+                {/* 🔹 UI OVERLAYS */}
+                <CustomCursor />
+                <Preloader />
+                <ScrollProgressIndicator />
+                <StickyEmail />
             </body>
         </html>
     );

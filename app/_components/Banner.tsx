@@ -80,8 +80,8 @@ const Banner = () => {
                             as="link"
                             target="_blank"
                             rel="noopener noreferrer"
-                            href="/resume.pdf"
-                            variant="outline"
+                            href="https://drive.google.com/file/d/13vbI5aq9XMS9g5iHM5MDxX-RHbtOsFcU/view?usp=sharing"
+                            variant="primary"
                             className="banner-button slide-up-and-fade"
                         >
                             Resume
