@@ -82,59 +82,63 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            {/* Analytics */}
-            <GoogleAnalytics gaId="G-MHLY1LNGY5" />
-
-            {/* Structured Data */}
-            <Script
-                id="structured-data"
-                type="application/ld+json"
-                strategy="beforeInteractive"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        '@context': 'https://schema.org',
-                        '@type': 'Person',
-                        name: 'Keshav Bhaiya',
-                        jobTitle: 'Full Stack Developer',
-                        sameAs: ['https://github.com/Keshav-Bhaiya'],
-                        alumniOf: {
-                            '@type': 'CollegeOrUniversity',
-                            name: 'LNCT Group, Bhopal',
-                        },
-                    }),
-                }}
-            />
-
-            {/* Hotjar */}
-            <Script id="hotjar" strategy="afterInteractive">
-                {`(function(h,o,t,j,a,r){
-                  h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-                  h._hjSettings={hjid:6380611,hjsv:6};
-                  a=o.getElementsByTagName('head')[0];
-                  r=o.createElement('script');r.async=1;
-                  r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-                  a.appendChild(r);
-                })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`}
-            </Script>
+            <head>
+                {/* ✅ Structured Data (JSON-LD) */}
+                <Script
+                    id="structured-data"
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            '@context': 'https://schema.org',
+                            '@type': 'Person',
+                            name: 'Keshav Bhaiya',
+                            jobTitle: 'Full Stack Developer',
+                            sameAs: [
+                                'https://github.com/Keshav-Bhaiya',
+                                'https://www.linkedin.com/in/keshav-bhaiya-021b092a7/',
+                            ],
+                            alumniOf: {
+                                '@type': 'CollegeOrUniversity',
+                                name: 'LNCT Group, Bhopal',
+                            },
+                        }),
+                    }}
+                />
+            </head>
 
             <body
                 className={`${antonFont.variable} ${robotoFlex.variable} antialiased relative`}
             >
-                {/* 🔹 BACKGROUND LAYER */}
+                {/* Analytics */}
+                <GoogleAnalytics gaId="G-MHLY1LNGY5" />
+
+                {/* 🔹 BACKGROUND */}
                 <ParticleBackground />
 
-                {/* 🔹 APP CONTENT */}
+                {/* 🔹 MAIN APP */}
                 <ReactLenis root options={{ lerp: 0.1, duration: 1.4 }}>
                     <Navbar />
                     <main className="relative z-[2]">{children}</main>
                     <Footer />
                 </ReactLenis>
 
-                {/* 🔹 UI OVERLAYS */}
+                {/* 🔹 OVERLAYS */}
                 <CustomCursor />
                 <Preloader />
                 <ScrollProgressIndicator />
                 <StickyEmail />
+
+                {/* Hotjar */}
+                <Script id="hotjar" strategy="afterInteractive">
+                    {`(function(h,o,t,j,a,r){
+                      h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+                      h._hjSettings={hjid:6380611,hjsv:6};
+                      a=o.getElementsByTagName('head')[0];
+                      r=o.createElement('script');r.async=1;
+                      r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+                      a.appendChild(r);
+                    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`}
+                </Script>
             </body>
         </html>
     );
