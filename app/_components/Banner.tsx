@@ -80,7 +80,7 @@ const Banner = () => {
                             as="link"
                             target="_blank"
                             rel="noopener noreferrer"
-                            href="https://drive.google.com/file/d/13vbI5aq9XMS9g5iHM5MDxX-RHbtOsFcU/view?usp=sharing"
+                            href="https://drive.google.com/file/d/1lUWS7rHkq0XajCrvqOnhLBUbML-kT1Nb/view?usp=sharing"
                             variant="primary"
                             className="banner-button slide-up-and-fade"
                         >
