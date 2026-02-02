@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
                 allow: '/',
             },
         ],
-        sitemap: 'https://viveksharma.tech/sitemap.xml',
+        sitemap: 'https://keshav-bhaiya.vercel.app/sitemap.xml',
     };
 }
