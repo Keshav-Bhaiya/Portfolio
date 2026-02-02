@@ -4,6 +4,7 @@ import TransitionLink from '@/components/TransitionLink';
 import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import Image from 'next/image';
 import { useRef } from 'react';
 
 interface Props {
@@ -17,7 +18,6 @@ gsap.registerPlugin(useGSAP);
 
 const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     const externalLinkSVGRef = useRef<SVGSVGElement>(null);
-    const projectRef = useRef<HTMLAnchorElement>(null);
 
     const { context, contextSafe } = useGSAP(() => {}, {
         scope: externalLinkSVGRef,
@@ -29,7 +29,6 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
 
         if (!externalLinkSVGRef.current) return;
 
-        // ✅ FIXED: Proper type casting for SVG path elements
         const arrowLine = externalLinkSVGRef.current.querySelector(
             '#arrow-line',
         ) as SVGPathElement | null;
@@ -42,29 +41,25 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
 
         if (!box || !arrowLine || !arrowCurb) return;
 
-        // ✅ FIXED: Check if getTotalLength exists before calling
-        const boxLength = box.getTotalLength ? box.getTotalLength() : 100;
-        const arrowLineLength = arrowLine.getTotalLength
-            ? arrowLine.getTotalLength()
-            : 100;
-        const arrowCurbLength = arrowCurb.getTotalLength
-            ? arrowCurb.getTotalLength()
-            : 100;
+        const boxLength = box.getTotalLength?.() ?? 100;
+        const arrowLineLength = arrowLine.getTotalLength?.() ?? 100;
+        const arrowCurbLength = arrowCurb.getTotalLength?.() ?? 100;
+
+        gsap.set([box, arrowLine, arrowCurb], {
+            opacity: 0,
+        });
 
         gsap.set(box, {
-            opacity: 0,
             strokeDasharray: boxLength,
             strokeDashoffset: boxLength,
         });
 
         gsap.set(arrowLine, {
-            opacity: 0,
             strokeDasharray: arrowLineLength,
             strokeDashoffset: arrowLineLength,
         });
 
         gsap.set(arrowCurb, {
-            opacity: 0,
             strokeDasharray: arrowCurbLength,
             strokeDashoffset: arrowCurbLength,
         });
@@ -97,11 +92,13 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
         >
             {/* MOBILE IMAGE */}
             {selectedProject === null && (
-                <img
+                <Image
                     src={project.thumbnail}
                     alt={project.title}
+                    width={900}
+                    height={600}
                     className="w-full aspect-[3/2] object-cover object-top mb-6 md:hidden"
-                    loading="lazy"
+                    priority={false}
                 />
             )}
 
