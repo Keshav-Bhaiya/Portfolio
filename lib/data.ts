@@ -219,9 +219,9 @@ export const PROJECTS: IProject[] = [
       </ul>
     `,
         techStack: ['React', 'JavaScript', 'TMDB API'],
-        thumbnail: '/projects/thumbnail/quickai.png',
-        longThumbnail: '/projects/long/quickai.png',
-        images: ['/projects/long/quickai.png'],
+        thumbnail: '/projects/thumbnail/scsdb.png',
+        longThumbnail: '/projects/long/scsdb.png',
+        images: ['/projects/long/scsdb.png'],
     },
 
     {
